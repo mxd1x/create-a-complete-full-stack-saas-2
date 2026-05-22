@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: leadforge-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: leadforge
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: leadforge-ai
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/leadforge?schema=public
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: replace-with-a-long-random-secret
+      OPENAI_API_KEY: ""
+      ADMIN_EMAIL: founder@leadforge.ai
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres-data:
